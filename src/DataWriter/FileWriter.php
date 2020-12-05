@@ -79,13 +79,16 @@ class FileWriter
         $vars = eval('?>'.$contents);
 
         $keys = explode('.', $key);
+        $last = array_pop($keys);
 
-        $isset = false;
-        while ($key = array_shift($keys)) {
-            $isset = isset($vars[$key]);
-            if (is_array($vars[$key])) $vars = $vars[$key];
+        foreach ($keys as $key) {
+            if (!isset($vars[$key]) || !is_array($vars[$key])) {
+                return false;
+            }
+            $vars = $vars[$key];
         }
 
-        return $isset;
+        // Last key can be added, unless there is no top level key
+        return sizeof($keys) > 0 || isset($vars[$last]);
     }
 }

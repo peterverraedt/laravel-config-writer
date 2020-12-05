@@ -97,9 +97,13 @@ class Rewrite
             $result = preg_replace($pattern, '${1}${2}' . $replaceValue, $result, 1, $count);
 
             if ($count > 0) {
-                break;
+                return $result;
             }
         }
+
+        $pattern = '/' . $this->buildArrayOpeningExpression($items) . '/';
+
+        preg_replace($pattern, '${1}' . PHP_EOL . '\'' . $key . '\' => ' . $replaceValue . ',', $result, 1);
 
         return $result;
     }
@@ -130,7 +134,7 @@ class Rewrite
         return $replaceValue;
     }
 
-    protected function writeArrayToPhp(array $array): array
+    protected function writeArrayToPhp(array $array): string
     {
         $result = [];
 
@@ -141,8 +145,6 @@ class Rewrite
         }
 
         return '['.implode(', ', $result).']';
-
-        return $result;
     }
 
     protected function buildStringExpression(string $targetKey, array $arrayItems = [], string $quoteChar = "'"): string
